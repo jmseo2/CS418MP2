@@ -4,6 +4,8 @@
 #include <OpenGL/glu.h>
 #include <GLUT/glut.h>
 #include "flight.h"
+#include "missile.h"
+#include "target.h"
 
 float sealevel;
 
@@ -197,7 +199,6 @@ void init(void)
 
 void display(void)
 {
-	updatePos();
 	GLfloat tanamb[] = {0.2,0.15,0.1,1.0};
 	GLfloat tandiff[] = {0.4,0.3,0.2,1.0};
 	GLfloat tanspec[] = {0.0,0.0,0.0,1.0};	// dirt doesn't glisten
@@ -214,10 +215,8 @@ void display(void)
 	glLoadIdentity ();             /* clear the matrix */
 	/* viewing transformation, look at the origin  */
 	lookAt();
-	//gluLookAt (0.5, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
-	//static GLfloat angle = 0.0;
-	//glRotatef(angle, 0.0, 0.0, 1.0);
-	//angle += 0.1;
+	drawMissiles();
+	drawTarget();
 
 	// send the light position down as if it was a vertex in world coordinates
 	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
@@ -288,6 +287,9 @@ void keyboard(unsigned char key, int x, int y)
 		case 27:
 			exit(0);
 			break;
+		case 'a':
+			addMissile();
+			break;
    }
 }
 
@@ -323,10 +325,10 @@ void specialKeysUp(int key, int x, int y) {
 
 void update() {
 	if(upPressed) {
-		pitch(-0.5);
+		pitch(-1);
 	}
 	if(downPressed) {
-		pitch(0.5);
+		pitch(1);
 	}
 	if(leftPressed) {
 		roll(0.5);
@@ -334,8 +336,10 @@ void update() {
 	if(rightPressed) {
 		roll(-0.5);
 	}
+	updatePos();
+	updateMissiles();
+	checkCollision();
 }
-
 
 int main(int argc, char** argv)
 {
